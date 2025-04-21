@@ -35,7 +35,7 @@ const Login = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto p-4 space-y-4">
+    <div className="max-w-md mx-auto p-4 space-y-4 dark:text-gray-900">
       <h2 className="text-xl font-bold">Login</h2>
       {err && <p className="text-red-500">{err}</p>}
       <form onSubmit={handleEmailLogin} className="space-y-2">
