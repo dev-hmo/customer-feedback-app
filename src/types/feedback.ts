@@ -5,4 +5,8 @@ export type Feedback = {
   rating: number;
   comment: string;
   date: string;
+
+  // ← add these two lines:
+  reply?: string;
+  replyDate?: string;
 };

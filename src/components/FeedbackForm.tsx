@@ -13,10 +13,10 @@ type Props = {
 
 const FeedbackForm = ({ editData, onUpdate }: Props) => {
   const { user } = useAuth();
-  const nav = useNavigate();
+  const navigate = useNavigate();
   const isEdit = Boolean(editData);
 
-  // form state
+  // form fields
   const [form, setForm] = useState<Feedback>(
     editData ?? {
       id: undefined,
@@ -27,14 +27,12 @@ const FeedbackForm = ({ editData, onUpdate }: Props) => {
       email: "",
     }
   );
-  // track whether we've just submitted
+  // whether we just submitted
   const [submitted, setSubmitted] = useState(false);
 
-  // if editData changes, load it into the form
+  // if editData changes, preload
   useEffect(() => {
-    if (editData) {
-      setForm(editData);
-    }
+    if (editData) setForm(editData);
   }, [editData]);
 
   const handleChange = (
@@ -49,11 +47,7 @@ const FeedbackForm = ({ editData, onUpdate }: Props) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!user) {
-      nav("/login");
-      return;
-    }
+    if (!user) return navigate("/login");
 
     const payload = {
       name: form.name,
@@ -74,23 +68,23 @@ const FeedbackForm = ({ editData, onUpdate }: Props) => {
       return;
     }
 
-    // show the thank-you screen instead of the form
+    // flip to thank-you screen
     setSubmitted(true);
     onUpdate?.();
   };
 
-  // 1) If just submitted, show the thank‑you + countdown
+  // 1) If we've just submitted, show the ThankYou component
   if (submitted) {
     return <ThankYou />;
   }
 
-  // 2) If not logged in, prompt to login
+  // 2) If not logged in, prompt to login (won't hit ThankYou)
   if (!user) {
     return (
       <div className="p-4">
         <p>
           Please{" "}
-          <button onClick={() => nav("/login")} className="underline">
+          <button onClick={() => navigate("/login")} className="underline">
             login
           </button>{" "}
           to submit feedback.
@@ -99,7 +93,7 @@ const FeedbackForm = ({ editData, onUpdate }: Props) => {
     );
   }
 
-  // 3) Otherwise, show the form
+  // 3) Otherwise, render the form
   return (
     <form
       onSubmit={handleSubmit}

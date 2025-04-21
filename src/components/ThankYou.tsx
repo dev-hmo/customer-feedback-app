@@ -1,51 +1,45 @@
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 
-const CIRCLE_RADIUS = 36;
-const CIRCLE_CIRCUMFERENCE = 2 * Math.PI * CIRCLE_RADIUS;
-
-const ThankYou = () => {
-  const nav = useNavigate();
-
+const ThankYou: React.FC = () => {
   useEffect(() => {
-    const timer = setTimeout(() => {
-      nav("/"); // back to home after 5s
+    console.log("ThankYou mounted – will redirect in 5s");
+    const timer = window.setTimeout(() => {
+      // full reload back to “/”
+      window.location.replace("/");
     }, 5000);
-    return () => clearTimeout(timer);
-  }, [nav]);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   return (
     <div className="flex flex-col items-center justify-center p-8 space-y-4">
-      {/* SVG Circle */}
+      {/* your SVG/progress circle */}
       <svg className="w-24 h-24" viewBox="0 0 80 80">
         <circle
           cx="40"
           cy="40"
-          r={CIRCLE_RADIUS}
+          r="36"
           fill="none"
-          stroke="#d1fae5" /* light green track */
+          stroke="#d1fae5"
           strokeWidth="8"
         />
         <circle
           cx="40"
           cy="40"
-          r={CIRCLE_RADIUS}
+          r="36"
           fill="none"
-          stroke="#10b981" /* green progress */
+          stroke="#10b981"
           strokeWidth="8"
-          strokeDasharray={CIRCLE_CIRCUMFERENCE}
-          strokeDashoffset={CIRCLE_CIRCUMFERENCE}
+          strokeDasharray={2 * Math.PI * 36}
+          strokeDashoffset={2 * Math.PI * 36}
           className="progress-circle"
         />
       </svg>
 
-      {/* Checkmark */}
       <div className="text-4xl text-green-600">✓</div>
-
-      {/* Message */}
       <p className="text-green-700 font-semibold text-lg">
         Thank you for your feedback!
       </p>
+      <p className="text-gray-500">Returning home in 5 seconds…</p>
     </div>
   );
 };
