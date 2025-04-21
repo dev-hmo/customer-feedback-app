@@ -39,7 +39,7 @@ const SignUp = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto p-4 space-y-4 dark:text-gray-900">
+    <div className="max-w-md mx-auto p-4 space-y-4">
       <h2 className="text-xl font-bold">Sign Up</h2>
       {err && <p className="text-red-500">{err}</p>}
 
@@ -50,7 +50,7 @@ const SignUp = () => {
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Email"
           required
-          className="w-full p-2 border rounded"
+          className="w-full p-2 border rounded dark:text-gray-900"
         />
         <input
           type="password"
@@ -58,7 +58,7 @@ const SignUp = () => {
           onChange={(e) => setPw(e.target.value)}
           placeholder="Password"
           required
-          className="w-full p-2 border rounded"
+          className="w-full p-2 border rounded dark:text-gray-900"
         />
         <button
           type="submit"

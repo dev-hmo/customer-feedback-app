@@ -4,6 +4,7 @@ import { db } from "../firebase";
 import { Feedback } from "../types/feedback";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import ThankYou from "./ThankYou";
 
 type Props = {
   editData?: Feedback | null;
@@ -15,21 +16,44 @@ const FeedbackForm = ({ editData, onUpdate }: Props) => {
   const nav = useNavigate();
   const isEdit = Boolean(editData);
 
+  // form state
   const [form, setForm] = useState<Feedback>(
-    editData ?? { name: "", email: "", rating: 0, comment: "", date: "" }
+    editData ?? {
+      id: undefined,
+      name: "",
+      rating: 0,
+      comment: "",
+      date: "",
+      email: "",
+    }
   );
+  // track whether we've just submitted
+  const [submitted, setSubmitted] = useState(false);
 
+  // if editData changes, load it into the form
   useEffect(() => {
-    if (editData) setForm(editData);
+    if (editData) {
+      setForm(editData);
+    }
   }, [editData]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+  ) => {
+    const { name, value } = e.target;
+    setForm((f) => ({
+      ...f,
+      [name]: name === "rating" ? Number(value) : value,
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return nav("/login");
+
+    if (!user) {
+      nav("/login");
+      return;
+    }
 
     const payload = {
       name: form.name,
@@ -39,16 +63,28 @@ const FeedbackForm = ({ editData, onUpdate }: Props) => {
       email: user.email!,
     };
 
-    if (isEdit && form.id) {
-      await updateDoc(doc(db, "feedback", form.id), payload);
-    } else {
-      await addDoc(collection(db, "feedback"), payload);
+    try {
+      if (isEdit && form.id) {
+        await updateDoc(doc(db, "feedback", form.id), payload);
+      } else {
+        await addDoc(collection(db, "feedback"), payload);
+      }
+    } catch (err) {
+      console.error("Failed to write feedback:", err);
+      return;
     }
 
-    setForm({ name: "", email: "", rating: 0, comment: "", date: "" });
+    // show the thank-you screen instead of the form
+    setSubmitted(true);
     onUpdate?.();
   };
 
+  // 1) If just submitted, show the thank‑you + countdown
+  if (submitted) {
+    return <ThankYou />;
+  }
+
+  // 2) If not logged in, prompt to login
   if (!user) {
     return (
       <div className="p-4">
@@ -63,10 +99,11 @@ const FeedbackForm = ({ editData, onUpdate }: Props) => {
     );
   }
 
+  // 3) Otherwise, show the form
   return (
     <form
       onSubmit={handleSubmit}
-      className="p-4 bg-gray-100 dark:bg-gray-800 dark:text-gray-900 rounded space-y-3"
+      className="p-4 bg-gray-100 dark:bg-gray-800 rounded space-y-4"
     >
       <input
         name="name"
@@ -83,21 +120,21 @@ const FeedbackForm = ({ editData, onUpdate }: Props) => {
         onChange={handleChange}
         min={1}
         max={5}
-        required
         placeholder="Rating (1-5)"
+        required
         className="w-full p-2 border rounded"
       />
       <textarea
         name="comment"
         value={form.comment}
         onChange={handleChange}
-        required
         placeholder="Your Feedback"
+        required
         className="w-full p-2 border rounded"
       />
       <button
         type="submit"
-        className="px-4 py-2 bg-blue-500 text-white rounded"
+        className="w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
       >
         {isEdit ? "Update Feedback" : "Submit Feedback"}
       </button>
