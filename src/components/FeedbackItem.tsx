@@ -5,19 +5,16 @@ type Props = {
   data: Feedback;
   onEdit?: (fb: Feedback) => void;
   onDelete?: (id: string) => void;
+  isAdmin?: boolean;
 };
 
-const FeedbackItem = ({ data, onEdit, onDelete }: Props) => {
-  // create a short snippet
+const FeedbackItem = ({ data, onEdit, onDelete, isAdmin }: Props) => {
   const snippet =
     data.comment.length > 50 ? data.comment.slice(0, 50) + "…" : data.comment;
 
-  // local alias for the ID
-  const id = data.id;
-
   const handleDelete = () => {
-    if (onDelete && id) {
-      onDelete(id);
+    if (onDelete && data.id) {
+      onDelete(data.id);
     }
   };
 
@@ -43,10 +40,7 @@ const FeedbackItem = ({ data, onEdit, onDelete }: Props) => {
             Edit
           </button>
         )}
-
-        {/* always render the button if onDelete exists,
-            but only call if id is defined */}
-        {onDelete && (
+        {isAdmin && onDelete && (
           <button onClick={handleDelete} className="text-red-500 underline">
             Delete
           </button>
